@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios'
+import SearchBox from './searchBox';
 import './App.css'
 
 const apiEndpoint = 'https://jsonplaceholder.typicode.com/todos'
@@ -9,7 +10,26 @@ class App extends Component {
     posts: [],
     isDialogOpen: false,
     lastUpdatedPost: {},
-    lastUpdatedPostIndex: ''
+    lastUpdatedPostIndex: '',
+    searchQuery: '',
+  }
+
+
+  handleSearch = (query) => {
+    this.setState({ searchQuery: query })
+  }
+
+  getPageData = () => {
+
+    let filtered = this.state.posts
+
+    if (this.state.searchQuery) {
+      filtered = this.state.posts.filter((m) =>
+        m.title.toLowerCase().startsWith(this.state.searchQuery.toLowerCase()),
+      )
+    }
+
+    return { filtered }
   }
 
   async componentDidMount() {
@@ -38,16 +58,16 @@ class App extends Component {
     //this.setState({ isDialogOpen: false })
     this.state.isDialogOpen = false
     this.handleUpdate()
-  } 
+  }
 
   handleUpdate = async () => {
     const text = document.getElementById('update').value
 
     const posts = [...this.state.posts]
-    const post = {...this.state.posts[this.state.lastUpdatedPostIndex]}
+    const post = { ...this.state.posts[this.state.lastUpdatedPostIndex] }
     post.title = text;
-    posts[this.state.lastUpdatedPostIndex] = {...post}
-    this.setState({posts});
+    posts[this.state.lastUpdatedPostIndex] = { ...post }
+    this.setState({ posts });
 
     try {
       await axios.put(apiEndpoint + '/' + post.id, post)
@@ -58,8 +78,8 @@ class App extends Component {
         console.log('Logging the error', ex)
         alert('An unexpected error has occured.')
       }
-      posts[this.state.lastUpdatedPostIndex] = {...this.state.lastUpdatedPost}
-    this.setState({posts});
+      posts[this.state.lastUpdatedPostIndex] = { ...this.state.lastUpdatedPost }
+      this.setState({ posts });
     }
     //creating a local copy of that object
     // const localPost = { ...post }
@@ -101,10 +121,18 @@ class App extends Component {
   }
 
   render() {
+
+    //getting the list of all the posts we want to add in the table
+    const { filtered: posts } = this.getPageData();
+
     return (
       <React.Fragment>
+
+        {/* main logo */}
         <h1 style={{ textAlign: 'center' }}>To Do List</h1>
 
+
+        {/* if we dont want to update the page, show the add task input field */}
         {!this.state.isDialogOpen && (
           <div className="input-group mb-3">
             <input
@@ -125,6 +153,14 @@ class App extends Component {
           </div>
         )}
 
+
+        {/* if we dont want the update page, show the search input field */}
+        {!this.state.isDialogOpen && (
+          <SearchBox onChange={this.handleSearch}></SearchBox>
+        )}
+
+
+        {/* if we want to update the page, show the update input field */}
         {this.state.isDialogOpen && (
           <div className="input-group mb-3">
             <input
@@ -149,6 +185,8 @@ class App extends Component {
           Add
         </button> */}
 
+
+        {/* mapping each post item into the table */}
         {!this.state.isDialogOpen && (
           <table className="table">
             <thead>
@@ -159,7 +197,7 @@ class App extends Component {
               </tr>
             </thead>
             <tbody>
-              {this.state.posts.map((post) => (
+              {posts.map((post) => (
                 <tr key={post.id}>
                   <td>{post.title}</td>
                   <td>
