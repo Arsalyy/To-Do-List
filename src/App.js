@@ -3,7 +3,7 @@ import axios from 'axios'
 import SearchBox from './searchBox';
 import './App.css'
 
-const apiEndpoint = 'https://jsonplaceholder.typicode.com/todos'
+const apiEndpoint = 'http://localhost:3000/api/tasks';
 
 class App extends Component {
   state = {
@@ -25,7 +25,7 @@ class App extends Component {
 
     if (this.state.searchQuery) {
       filtered = this.state.posts.filter((m) =>
-        m.title.toLowerCase().startsWith(this.state.searchQuery.toLowerCase()),
+        m.name.toLowerCase().startsWith(this.state.searchQuery.toLowerCase()),
       )
     }
 
@@ -40,7 +40,7 @@ class App extends Component {
   handleAdd = async () => {
     const text = document.getElementById('userInput').value
 
-    const obj = { title: text }
+    const obj = { name: text }
     const { data: post } = await axios.post(apiEndpoint, obj)
 
     const posts = [post, ...this.state.posts]
@@ -65,12 +65,12 @@ class App extends Component {
 
     const posts = [...this.state.posts]
     const post = { ...this.state.posts[this.state.lastUpdatedPostIndex] }
-    post.title = text;
+    post.name = text;
     posts[this.state.lastUpdatedPostIndex] = { ...post }
     this.setState({ posts });
 
     try {
-      await axios.put(apiEndpoint + '/' + post.id, post)
+      await axios.put(apiEndpoint + '/' + post._id, post)
     } catch (ex) {
       if (ex.response && ex.response.status === 404)
         alert('This post has already been updated.')
@@ -103,11 +103,11 @@ class App extends Component {
   handleDelete = async (post) => {
     const originalPosts = this.state.posts
 
-    const posts = this.state.posts.filter((p) => p.id !== post.id)
+    const posts = this.state.posts.filter((p) => p._id !== post._id)
     this.setState({ posts })
 
     try {
-      await axios.delete(apiEndpoint + '/' + post.id)
+      await axios.delete(apiEndpoint + '/' + post._id)
     } catch (ex) {
       if (ex.response && ex.response.status === 404)
         alert('This post has already been deleted.')
@@ -121,9 +121,11 @@ class App extends Component {
   }
 
   render() {
+    console.log(this.state.posts);
 
     //getting the list of all the posts we want to add in the table
     const { filtered: posts } = this.getPageData();
+
 
     return (
       <React.Fragment>
@@ -199,7 +201,7 @@ class App extends Component {
             <tbody>
               {posts.map((post) => (
                 <tr key={post.id}>
-                  <td>{post.title}</td>
+                  <td>{post.name}</td>
                   <td>
                     <button
                       className="btn btn-info btn-sm"
