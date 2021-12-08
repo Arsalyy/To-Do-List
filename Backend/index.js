@@ -13,4 +13,6 @@ mongoose.connect('mongodb://localhost/todo')
 app.use(express.json());
 app.use('/api/tasks', tasks);
 
-app.listen(3000, () => console.log('Listenng on Port 3000...'));
+const server = app.listen(3000, () => console.log('Listenng on Port 3000...'));
+
+module.exports = server;

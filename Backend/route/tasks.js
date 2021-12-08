@@ -1,11 +1,9 @@
 const { Task } = require('../model/task');
-const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
     const tasks = await Task.find();
-    console.log('xxx');
     res.send(tasks);
 });
 
