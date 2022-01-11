@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const tasksSchema = new mongoose.Schema({ name: String });
+const tasksSchema = new mongoose.Schema({ name: String, userId: String });
 
 const Task = mongoose.model('Task', tasksSchema);
 

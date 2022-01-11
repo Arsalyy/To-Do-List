@@ -1,10 +1,19 @@
 import React from 'react';
 
-const InputField = ({ placeholder, onChange }) => {
+const InputField = ({ placeholder, onChange, type, id }) => {
+
+    if(!type){
+        type = "text"
+    }
+
+    if(!id){
+        id = "userInput"
+    }
+
     return (
         <input
-            id="userInput"
-            type="text"
+            id={id}
+            type={type}
             className="form-control"
             placeholder={placeholder}
             onChange={onChange}
